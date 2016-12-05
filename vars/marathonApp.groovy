@@ -52,7 +52,7 @@ def call (body) {
                                 filecontents = filecontents   
                                     .replaceAll('_MYSQL_USER_', env.MYSQL_USER)
                                     .replaceAll('_MYSQL_PASSWORD_', env.MYSQL_PASSWORD)
-                                    .replaceAll('_MYSQL_DATABASE_', config.mysql_database)
+                                    .replaceAll('_MYSQL_DATABASE_', app.mysql_database)
                                     .replaceAll('_MYSQL_ROOT_PASSWORD_', env.MYSQL_ROOT_PASSWORD)
                             }
                         } 
