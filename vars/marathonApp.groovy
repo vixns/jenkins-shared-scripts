@@ -31,7 +31,7 @@ def call (body) {
 
                     withCredentials([
                         usernamePassword(credentialsId: "marathonId", usernameVariable: 'MARATHON_USER', passwordVariable: 'MARATHON_PASSWORD'),
-                        string(credentialsId: nasUri(config), variable: 'NAS_URI')                        
+                        string(credentialsId: "nasUri-${app.owner}", variable: 'NAS_URI')                        
                         ]) {
 
                         def filename = "${app.name}-${app.env}.json"
