@@ -47,7 +47,7 @@ def call (body) {
                         if (app.mysql_database != null) {
                             withCredentials([
                                 usernamePassword(credentialsId: "${app.owner}_${app.ns}_${app.group}_mysql", usernameVariable: 'MYSQL_USER', passwordVariable: 'MYSQL_PASSWORD'),
-                                string(credentialsId: "${app.owner}_mysql_root_password", variable: 'MYSQL_ROOT_PASSWORD')
+                                string(credentialsId: "${app.owner}_${app.ns}_mysql_root_password", variable: 'MYSQL_ROOT_PASSWORD')
                                 ]) {
                                 filecontents = filecontents   
                                     .replaceAll('_MYSQL_USER_', env.MYSQL_USER)
