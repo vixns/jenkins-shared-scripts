@@ -68,7 +68,7 @@ def call (body) {
                                     credentialsId: 'marathonId',
                                     filename: filename,
                                     forceUpdate: true,
-                                    appid: "/${app.owner}/${app.ns}/${app.group}/${app.name}",
+                                    appid: "/${app.owner}/${app.ns}/${app.group}/${app.env}/${app.name}",
                                     docker: app.image
                                 )
                             //}
