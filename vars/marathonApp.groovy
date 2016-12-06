@@ -7,7 +7,7 @@ def call (body) {
     body.delegate = config
     body()
 
-    withSlackNotification(config.channel) {
+    withSlackNotification(config.slack_channel) {
         node {
             checkout scm
             short_commit=gitCommit().take(8)                        
