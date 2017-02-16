@@ -22,7 +22,7 @@ class Utils {
         def commit = getCommit(script)
         if (commit) {
             def desc = script.sh(script: "git describe --always --tags ${commit}", returnStdout: true)?.trim()
-            if (desc =~ /.+-[0-9]+-g[0-9A-Fa-f]{6,}$/) {
+            if (desc =~ /.+-[0-9]+-g[0-9A-Fa-f]{6,}$/ || desc == commit.take(7)) {
                 return null
             }
             return desc
