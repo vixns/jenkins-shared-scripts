@@ -1,6 +1,6 @@
 import net.vixns.Utils
 
-def call (channel,body) {
+def call (team,token,channel,body) {
 
     try {
         body()    
@@ -25,8 +25,8 @@ def call (channel,body) {
         }
         slackSend(
             channel: channel, 
-            tokenCredentialId: 'vixns_token_id',
-            teamDomain: 'vixns',
+            tokenCredentialId: token,
+            teamDomain: team,
             color: color, 
             message: "<${env.JOB_URL}|${env.JOB_NAME}> ${env.BRANCH_NAME} build <${env.BUILD_URL}/console|${currentBuild.result}>\n${net.vixns.Utils.summarizeBuild(currentBuild)}"
         )

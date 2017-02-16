@@ -10,4 +10,27 @@ class Utils {
             }.join('\n')
         }.join('\n')
     }
+
+    static boolean hasBreakingChangeTag(def script) {
+        def match = gitTagName(script) =~ /-bc$/
+        def result = match
+        match = null // prevent serialisation
+        return result
+    }
+
+    static String gitTagName(def script) {
+        def commit = getCommit(script)
+        if (commit) {
+            def desc = script.sh(script: "git describe --tags ${commit}", returnStdout: true)?.trim()
+            if (desc =~ /.+-[0-9]+-g[0-9A-Fa-f]{6,}$/) {
+                return null
+            }
+            return desc
+        }
+        return null
+    }
+
+    static String getCommit(def script) {
+        return script.sh(script: 'git rev-parse HEAD', returnStdout: true)?.trim()
+    }
 }

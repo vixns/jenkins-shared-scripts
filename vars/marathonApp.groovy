@@ -7,27 +7,36 @@ def call (body) {
     body.delegate = config
     body()
 
-    withSlackNotification(config.slack_channel) {
+    def slaskTeam = (config.slack.team != null) ? config.slack.team : 'vixns'
+    def slaskToken = (config.slack.token != null) ? config.slack.token : 'vixns_token_id'
+    def slaskChannel = (config.slack.channel != null) ? config.slack.channel : config.slack_channel
+
+    withSlackNotification(slaskTeam,slaskToken,slaskChannel) {
         node {
             checkout scm
-            short_commit=gitCommit().take(8)                        
+            def git_tag = net.vixns.Utils.gitTagName(this)
+            def docker_label = git_tag
+            if (docker_label == null) docker_label = net.vixns.Utils.getCommit(this).take(8)
+
             docker.withRegistry('https://registry.vixns.net/', 'registry_vixns_net') {
                 for (def app in config.apps) {
                     
                     if(app.branch != env.BRANCH_NAME) continue
+                    if(app.tagged_only && git_tag == null) continue
 
                     if(app.image == null) {
                         def image = "${app.owner}/${app.ns}/${app.group}/${app.name}"
-                        app.image = "registry.vixns.net/${image}:${short_commit}"
+                        app.image = "registry.vixns.net/${image}:${docker_label}"
                         stage("Build docker image ${app.name}") {
                             if(app.basedir == null) {
-                                docker.build(image).push(short_commit)
+                                docker.build(image).push(docker_label)
                             } else {
-                                docker.build(image,app.basedir).push(short_commit)
+                                docker.build(image,app.basedir).push(docker_label)
                             }
                         }
                     }
 
+                    if(app.framework == null) app.framework = 'marathon';
 
                     withCredentials([
                         usernamePassword(credentialsId: "marathonId", usernameVariable: 'MARATHON_USER', passwordVariable: 'MARATHON_PASSWORD'),
@@ -35,34 +44,12 @@ def call (body) {
                         ]) {
 
                         def filename = "${app.name}-${app.env}.json"
-                        def filecontents = readFile("deploy/${app.env}/${app.name}.json")
-                                    .replaceAll('_NS_', app.ns)
-                                    .replaceAll('_GROUP_', app.group)
-                                    .replaceAll('_NAME_', app.name)
-                                    .replaceAll('_OWNER_', app.owner)
-                                    .replaceAll('_ENV_', app.env)
-                                    .replaceAll('_NAS_URI_', env.NAS_URI)
-                                    .replaceAll('_DOCKER_IMAGE_', app.image)
-
-                        if (app.mysql_database != null) {
-                            withCredentials([
-                                usernamePassword(credentialsId: "${app.owner}_${app.ns}_${app.group}_mysql", usernameVariable: 'MYSQL_USER', passwordVariable: 'MYSQL_PASSWORD'),
-                                string(credentialsId: "${app.owner}_${app.ns}_mysql_root_password", variable: 'MYSQL_ROOT_PASSWORD')
-                                ]) {
-                                filecontents = filecontents   
-                                    .replaceAll('_MYSQL_USER_', env.MYSQL_USER)
-                                    .replaceAll('_MYSQL_PASSWORD_', env.MYSQL_PASSWORD)
-                                    .replaceAll('_MYSQL_DATABASE_', app.mysql_database)
-                                    .replaceAll('_MYSQL_ROOT_PASSWORD_', env.MYSQL_ROOT_PASSWORD)
-                            }
-                        } 
-
-                        writeFile(file: filename, text:filecontents)
-
-                        stage("Deploy ${app.ns}/${app.group}/${app.name} to ${app.env}"){
-                            //if(app.type == 'chronos') {
-                            //    sh("curl -sL -H \"Content-Type: application/json\" -X POST ${chronosUrl}/scheduler/iso8601 -d@${filename}")
-                            //} else {
+                        writeFile(
+                            file: filename,
+                            text: reifyTemplate(readFile("deploy/${app.env}/${app.name}.json"), app)
+                        )
+                        if(app.framework == 'marathon') {
+                            stage("Deploy ${app.ns}/${app.group}/${app.name} to ${app.env}"){
                                 marathon(
                                     url: 'https://marathon.vixns.net:8443/',
                                     credentialsId: 'marathonId',
@@ -71,7 +58,9 @@ def call (body) {
                                     appid: "/${app.owner}/${app.ns}/${app.group}/${app.env}/${app.name}",
                                     docker: app.image
                                 )
-                            //}
+                            }
+                        } else {
+                            error("can only deploy for marathon framework.")
                         }
                     }
                 }
