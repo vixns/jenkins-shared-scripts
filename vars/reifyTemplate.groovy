@@ -25,7 +25,7 @@ def call (template, app) {
         
         filecontents = filecontents   
             .replaceAll('_COMMAND_', command)
-            .replaceAll('_PERIOD_MINUTES_', app.command.period_minutes)
+            .replaceAll('_PERIOD_MINUTES_', (app.command.period_minutes != null) ? app.command.period_minutes : "15")
     } 
 
     if (app.mysql != null) {
