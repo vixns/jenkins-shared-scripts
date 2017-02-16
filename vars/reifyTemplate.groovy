@@ -101,16 +101,25 @@ def call (template, app) {
 
     if (app.varnish != null) {
         if(app.varnish.port == null) app.varnish.port = "6082"
-        withCredentials([
-            string(credentialsId: "ifprofs_varnish_key", variable: 'VARNISH_KEY'),
-            string(credentialsId: "ifprofs_varnish_passphrase", variable: 'VARNISH_PASSPHRASE')
-            ]) {
-            filecontents = filecontents   
-                .replaceAll('_VARNISH_HOST_', app.varnish.host)
-                .replaceAll('_VARNISH_PORT_', app.varnish.port)
-                .replaceAll('_VARNISH_KEY_', env.VARNISH_KEY)
-                .replaceAll('_VARNISH_PASSPHRASE_', env.VARNISH_PASSPHRASE)
+        filecontents = filecontents   
+            .replaceAll('_VARNISH_HOST_', app.varnish.host)
+            .replaceAll('_VARNISH_PORT_', app.varnish.port)
+
+        if(app.varnish.key == null) {
+            withCredentials([
+                string(credentialsId: "varnish_key", variable: 'VARNISH_KEY'),
+                string(credentialsId: "varnish_passphrase", variable: 'VARNISH_PASSPHRASE')
+                ]) {
+                filecontents = filecontents   
+                    .replaceAll('_VARNISH_KEY_', env.VARNISH_KEY)
+                    .replaceAll('_VARNISH_PASSPHRASE_', env.VARNISH_PASSPHRASE)
+            }
+        } else {
+                filecontents = filecontents   
+                    .replaceAll('_VARNISH_KEY_', app.varnish.key)
+                    .replaceAll('_VARNISH_PASSPHRASE_', app.varnish.passphrase)            
         }
     }
+    
     filecontents
 }
