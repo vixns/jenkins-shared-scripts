@@ -16,8 +16,6 @@ def call (template, app) {
                 .replaceAll('_NAS_URI_', env.NAS_URI)
                 .replaceAll('_DOCKER_IMAGE_', app.image)
                 .replaceAll('_VHOST_', app.vhost)
-                .replaceAll('_DRUPAL_SALT_', env.DRUPAL_SALT)
-
 
     if (app.command != null) {
     	def command = app.command.regular
