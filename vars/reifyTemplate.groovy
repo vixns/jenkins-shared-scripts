@@ -15,7 +15,10 @@ def call (template, app) {
                 .replaceAll('_ENV_', app.env)
                 .replaceAll('_NAS_URI_', env.NAS_URI)
                 .replaceAll('_DOCKER_IMAGE_', app.image)
-                .replaceAll('_VHOST_', app.vhost)
+
+    if (app.vhost != null)
+        filecontents = filecontents
+            .replaceAll('_VHOST_', app.vhost)
 
     if (app.command != null) {
     	def command = app.command.regular
