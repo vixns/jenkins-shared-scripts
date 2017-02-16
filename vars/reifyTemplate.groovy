@@ -32,8 +32,7 @@ def call (template, app) {
         if(app.group != null) mysqlCredentialsPrefix = "${app.owner}_${app.ns}_${app.group}"
 
         withCredentials([
-            usernamePassword(credentialsId: "${mysqlCredentialsPrefix}_mysql", usernameVariable: 'MYSQL_USER', passwordVariable: 'MYSQL_PASSWORD'),
-            string(credentialsId: "${app.owner}_${app.ns}_mysql_root_password", variable: 'MYSQL_ROOT_PASSWORD')
+            usernamePassword(credentialsId: "${mysqlCredentialsPrefix}_mysql", usernameVariable: 'MYSQL_USER', passwordVariable: 'MYSQL_PASSWORD')
             ]) {
             filecontents = filecontents   
                 .replaceAll('_MYSQL_USER_', env.MYSQL_USER)
@@ -41,7 +40,6 @@ def call (template, app) {
                 .replaceAll('_MYSQL_HOST_', app.mysql.host)
                 .replaceAll('_MYSQL_PORT_', app.mysql.port)
                 .replaceAll('_MYSQL_DATABASE_', app.mysql.database)
-                .replaceAll('_MYSQL_ROOT_PASSWORD_', env.MYSQL_ROOT_PASSWORD)
         }
     } 
 
