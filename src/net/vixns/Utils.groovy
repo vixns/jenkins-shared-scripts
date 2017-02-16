@@ -21,7 +21,7 @@ class Utils {
     static String gitTagName(def script) {
         def commit = getCommit(script)
         if (commit) {
-            def desc = script.sh(script: "git describe --tags ${commit}", returnStdout: true)?.trim()
+            def desc = script.sh(script: "git describe --always --tags ${commit}", returnStdout: true)?.trim()
             if (desc =~ /.+-[0-9]+-g[0-9A-Fa-f]{6,}$/) {
                 return null
             }
