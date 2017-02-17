@@ -47,7 +47,7 @@ def call (template, app) {
     } 
 
     if (app.drupal != null) {
-        if(app.drupal.salt == null) {
+        if(app.drupal instanceof Boolean || app.drupal.salt == null) {
             try {
                 withCredentials([string(credentialsId: 'drupalSalt', variable: 'DRUPAL_SALT')]) {
                     filecontents = filecontents   
@@ -70,7 +70,7 @@ def call (template, app) {
     } 
 
     if (app.sentry != null) {
-        if(app.sentry.dsn == null) {
+        if(app.sentry instanceof Boolean || app.sentry.dsn == null) {
             withCredentials([
                 string(credentialsId: "${app.env}_sentry_dsn", variable: 'SENTRY_DSN'),                     
                 string(credentialsId: "${app.env}_sentry_public_dsn", variable: 'SENTRY_PUBLIC_DSN')                   
