@@ -9,7 +9,7 @@ def call (template, app) {
 
     def filecontents = template
                 .replaceAll('_NS_', app.ns)
-                .replaceAll('_GROUP_', app.group)
+                .replaceAll('_GROUP_', (app.group == null) ? '' : app.group)
                 .replaceAll('_OWNER_', app.owner)
                 .replaceAll('_NAME_', app.name)
                 .replaceAll('_ENV_', app.env)
@@ -120,6 +120,6 @@ def call (template, app) {
                     .replaceAll('_VARNISH_PASSPHRASE_', app.varnish.passphrase)            
         }
     }
-    
+
     filecontents
 }
