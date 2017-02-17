@@ -94,9 +94,11 @@ def call (template, app) {
 
     if (app.memcache != null) {
         if(app.memcache.port == null) app.memcache.port = "11211"
+        if(app.memcache.prefix == null) app.memcache.prefix = ""
         filecontents = filecontents   
             .replaceAll('_MEMCACHE_HOST_', app.memcache.host)
             .replaceAll('_MEMCACHE_PORT_', app.memcache.port)
+            .replaceAll('_MEMCACHE_PREFIX_', app.memcache.prefix)
     } 
 
     if (app.varnish != null) {
