@@ -21,8 +21,7 @@ def call (template, app) {
             .replaceAll('_VHOST_', app.vhost)
 
     if (app.command != null) {
-    	def command = app.command.regular
-        
+        def command = (app.hasBreakingChanges != null && app.hasBreakingChanges) ? app.command.bc : app.command.regular
         filecontents = filecontents   
             .replaceAll('_COMMAND_', command)
             .replaceAll('_PERIOD_MINUTES_', (app.command.period_minutes != null) ? app.command.period_minutes : "15")
