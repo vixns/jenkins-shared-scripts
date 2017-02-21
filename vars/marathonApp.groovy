@@ -7,9 +7,9 @@ def call (body) {
     body.delegate = config
     body()
 
-    def slaskTeam = (config.slack.team != null) ? config.slack.team : 'vixns'
-    def slaskToken = (config.slack.token != null) ? config.slack.token : 'vixns_token_id'
-    def slaskChannel = (config.slack.channel != null) ? config.slack.channel : config.slack_channel
+    def slaskTeam = (config.slack != null && config.slack.team != null) ? config.slack.team : 'vixns'
+    def slaskToken = (config.slack != null && config.slack.token != null) ? config.slack.token : 'vixns_token_id'
+    def slaskChannel = (config.slack != null && config.slack.channel != null) ? config.slack.channel : config.slack_channel
 
     withSlackNotification(slaskTeam,slaskToken,slaskChannel) {
         node {
