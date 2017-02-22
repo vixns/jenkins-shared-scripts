@@ -12,12 +12,8 @@ class Utils {
     }
 
     static boolean hasBreakingChangeTag(def script) {
-    	def name = gitTagName(script)
-    	if (name == null) return false
-        def match = name =~ /\+bc$/
-        def result = match
-        match = null // prevent serialisation
-        return result
+        if ( gitTagName(script) =~ /\+bc$/ } return true
+        return false
     }
 
     static String gitTagName(def script) {
