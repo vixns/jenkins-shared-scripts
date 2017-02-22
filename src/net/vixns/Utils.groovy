@@ -12,7 +12,8 @@ class Utils {
     }
 
     static boolean hasBreakingChangeTag(def script) {
-        if ( gitTagName(script) =~ /\+bc$/ } return true
+        def name = gitTagName(script)
+        if ( name =~ /\+bc$/ } return true
         return false
     }
 
