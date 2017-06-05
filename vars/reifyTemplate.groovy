@@ -20,6 +20,10 @@ def call (template, app) {
         filecontents = filecontents
             .replaceAll('_VHOST_', app.vhost)
 
+    if (app.hc_path != null)
+        filecontents = filecontents
+            .replaceAll('_HC_PATH_', app.hc_path)
+
     if (app.command != null) {
         def command = (app.hasBreakingChanges != null && app.hasBreakingChanges) ? app.command.bc : app.command.regular
         filecontents = filecontents   
@@ -27,6 +31,27 @@ def call (template, app) {
             .replaceAll('_PERIOD_MINUTES_', (app.command.period_minutes != null) ? app.command.period_minutes : "15")
     } 
 
+    if (app.sentry != null) {
+        withCredentials([
+            string(credentialsId: "sentry_dsn", variable: 'SENTRY_DSN'),
+            string(credentialsId: "sentry_public_dsn", variable: 'SENTRY_PUBLIC_DSN'),
+            ]) {
+            filecontents = filecontents
+                .replaceAll('_SENTRY_DSN_', env.SENTRY_DSN)
+                .replaceAll('_SENTRY_PUBLIC_DSN_', env.SENTRY_PUBLIC_DSN)
+        }
+    }
+
+    if (app.http_auth != null) {
+        withCredentials([
+            usernamePassword(credentialsId: "http_auth", usernameVariable: 'HTTP_USER', passwordVariable: 'HTTP_PASS'),
+            string(credentialsId: "sentry_public_dsn", variable: 'SENTRY_PUBLIC_DSN'),
+            ]) {
+            filecontents = filecontents
+                .replaceAll('_HTTP_USER_', env.HTTP_USER)
+                .replaceAll('_HTTP_PASS_', env.HTTP_PASS)
+        }
+    }
     if (app.mysql != null) {
         if(app.mysql.port == null) app.mysql.port = "3306"
 
