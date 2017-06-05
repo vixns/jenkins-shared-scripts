@@ -45,7 +45,6 @@ def call (template, app) {
     if (app.http_auth != null) {
         withCredentials([
             usernamePassword(credentialsId: "http_auth", usernameVariable: 'HTTP_USER', passwordVariable: 'HTTP_PASS'),
-            string(credentialsId: "sentry_public_dsn", variable: 'SENTRY_PUBLIC_DSN'),
             ]) {
             filecontents = filecontents
                 .replaceAll('_HTTP_USER_', env.HTTP_USER)
