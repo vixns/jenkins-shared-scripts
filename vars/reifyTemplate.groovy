@@ -16,21 +16,33 @@ def call (template, app) {
                 .replaceAll('_NAS_URI_', env.NAS_URI)
                 .replaceAll('_DOCKER_IMAGE_', app.image)
 
+    if (app.vars != null)
+        app.vars.each{ k, v -> filecontents = filecontents.replaceAll("_${k.toUpperCase()}_", v) }
+
+    if (app.secrets != null)
+        app.secrets.each{ k, v ->
+            try {
+                withCredentials([
+                    string(credentialsId: v, variable: 'CRED'),
+                    ]) {
+                    filecontents = filecontents.replaceAll("_${k.toUpperCase()}_", env.CRED)
+                }
+            } catch (_) {
+                error("cannot find ${v} credential, add a '${v}' secret text credential in jenkins.")
+            }
+        }
+
+    // legacy
     if (app.vhost != null)
         filecontents = filecontents
             .replaceAll('_VHOST_', app.vhost)
 
+    // legacy
     if (app.hc_path != null)
         filecontents = filecontents
             .replaceAll('_HC_PATH_', app.hc_path)
 
-    if (app.command != null) {
-        def command = (app.hasBreakingChanges != null && app.hasBreakingChanges) ? app.command.bc : app.command.regular
-        filecontents = filecontents   
-            .replaceAll('_COMMAND_', command)
-            .replaceAll('_PERIOD_MINUTES_', (app.command.period_minutes != null) ? app.command.period_minutes : "15")
-    } 
-
+    // legacy
     if (app.sentry != null) {
         withCredentials([
             string(credentialsId: "sentry_dsn", variable: 'SENTRY_DSN'),
@@ -42,13 +54,24 @@ def call (template, app) {
         }
     }
 
+    if (app.command != null) {
+        def command = (app.hasBreakingChanges != null && app.hasBreakingChanges) ? app.command.bc : app.command.regular
+        filecontents = filecontents
+            .replaceAll('_COMMAND_', command)
+            .replaceAll('_PERIOD_MINUTES_', (app.command.period_minutes != null) ? app.command.period_minutes : "15")
+    }
+
     if (app.http_auth != null) {
-        withCredentials([
-            usernamePassword(credentialsId: "http_auth", usernameVariable: 'HTTP_USER', passwordVariable: 'HTTP_PASS'),
-            ]) {
-            filecontents = filecontents
-                .replaceAll('_HTTP_USER_', env.HTTP_USER)
-                .replaceAll('_HTTP_PASS_', env.HTTP_PASS)
+        try {
+            withCredentials([
+                usernamePassword(credentialsId: "http_auth", usernameVariable: 'HTTP_USER', passwordVariable: 'HTTP_PASS'),
+                ]) {
+                filecontents = filecontents
+                    .replaceAll('_HTTP_USER_', env.HTTP_USER)
+                    .replaceAll('_HTTP_PASS_', env.HTTP_PASS)
+            }
+        } catch (_) {
+            error("cannot find http credentials, add a 'http_auth' username+password credential in jenkins. To generate a valid password: 'openssl passwd THEPASS'.")
         }
     }
     if (app.mysql != null) {
@@ -69,11 +92,12 @@ def call (template, app) {
         }
     } 
 
+    // legacy
     if (app.drupal != null) {
         if(app.drupal instanceof Boolean || app.drupal.salt == null) {
             try {
                 withCredentials([string(credentialsId: 'drupalSalt', variable: 'DRUPAL_SALT')]) {
-                    filecontents = filecontents   
+                    filecontents = filecontents
                         .replaceAll('_DRUPAL_SALT_', env.DRUPAL_SALT)
                 }
             } catch (_) {
@@ -85,6 +109,7 @@ def call (template, app) {
         }    
     }
 
+    //legacy
     if (app.smtp != null) {
         if(app.smtp.port == null) app.smtp.port = "25"
         filecontents = filecontents   
@@ -92,6 +117,7 @@ def call (template, app) {
             .replaceAll('_SMTP_PORT_', app.smtp.port)
     } 
 
+    //legacy
     if (app.sentry != null) {
         if(app.sentry instanceof Boolean || app.sentry.dsn == null) {
             withCredentials([
@@ -108,6 +134,7 @@ def call (template, app) {
                     .replaceAll('_SENTRY_PUBLIC_DSN_', app.sentry.public_dsn)                        
         }
     }
+
     if (app.solr != null) {
         if(app.solr.port == null) app.solr.port = "8389"
         filecontents = filecontents   
