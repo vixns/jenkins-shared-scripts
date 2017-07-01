@@ -18,15 +18,16 @@ def call (body) {
             def docker_label = git_tag
             if (docker_label == null) docker_label = net.vixns.Utils.getCommit(this).take(8)
 
-            docker.withRegistry('https://registry.vixns.net/', 'registry_vixns_net') {
-                for (def app in config.apps) {
+            for (def app in config.apps) {
                     
-                    if(app.branch != env.BRANCH_NAME) continue
-                    if(app.tagged_only && git_tag == null) continue
-
+                if(app.branch != env.BRANCH_NAME) continue
+                if(app.tagged_only && git_tag == null) continue
+                def dockerRegistry = (app.docker != null && app.docker.registry != null) ? app.docker.registry : 'registry.vixns.net'
+                def dockerRegistryCredentialsId = (app.docker != null && app.docker.credentialsId != null) ? app.docker.credentialsId : 'registry_vixns_net'
+                docker.withRegistry("https://${dockerRegistry}/", dockerRegistryCredentialsId) {
                     if(app.image == null) {
                         def image = "${app.owner}/${app.ns}/${app.group}/${app.name}"
-                        app.image = "registry.vixns.net/${image}:${docker_label}"
+                        app.image = "${dockerRegistry}/${image}:${docker_label}"
                         stage("Build docker image ${app.name}") {
                             if(app.basedir == null) {
                                 docker.build(image).push(docker_label)
