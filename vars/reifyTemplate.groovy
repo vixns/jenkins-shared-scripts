@@ -11,6 +11,7 @@ def call (template, app) {
                 .replaceAll('_NS_', app.ns)
                 .replaceAll('_GROUP_', (app.group == null) ? '' : app.group)
                 .replaceAll('_OWNER_', app.owner)
+                .replaceAll('_APP_', app.name) //legacy
                 .replaceAll('_NAME_', app.name)
                 .replaceAll('_ENV_', app.env)
                 .replaceAll('_NAS_URI_', env.NAS_URI)
