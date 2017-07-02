@@ -19,7 +19,7 @@ def call (template, app) {
     if (app.vars != null)
         app.vars.each{ k, v -> filecontents = filecontents.replaceAll("_${k.toUpperCase()}_", v) }
 
-    if (app.secrets != null)
+    if (app.secrets != null) {
         if (app.secrets.text != null)
             app.secrets.text.each{ k, v ->
                 try {
@@ -46,7 +46,7 @@ def call (template, app) {
                     error("cannot find ${v} credential, add a '${v}' username+password credential in jenkins.")
                 }
             }
-
+    }
     // legacy begin
     if (app.hc_path != null)
         filecontents = filecontents
