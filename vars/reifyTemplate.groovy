@@ -41,7 +41,7 @@ def call (template, app) {
                         ]) {
                         filecontents = filecontents
                             .replaceAll("_${k.toUpperCase()}_USER_", env.CRED_USER)
-                            .replaceAll("_${k.toUpperCase()}_PASS_", env.CRED_PASS)
+                            .replace("_${k.toUpperCase()}_PASS_", env.CRED_PASS)
                     }
                 } catch (_) {
                     error("cannot find ${v} credential, add a '${v}' username+password credential in jenkins.")
