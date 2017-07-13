@@ -95,7 +95,7 @@ def call (template, app) {
                 ]) {
                 filecontents = filecontents
                     .replaceAll('_HTTP_USER_', env.HTTP_USER)
-                    .replaceAll('_HTTP_PASS_', env.HTTP_PASS)
+                    .replace('_HTTP_PASS_', env.HTTP_PASS)
             }
         } catch (_) {
             error("cannot find http credentials, add a 'http_auth' username+password credential in jenkins. To generate a valid password: 'openssl passwd THEPASS'.")
