@@ -16,7 +16,8 @@ def call (body) {
             checkout scm
             def git_tag = net.vixns.Utils.gitTagName(this)
             def docker_label = git_tag
-            if (docker_label == null) docker_label = net.vixns.Utils.getCommit(this).take(8)
+            def short_commit = net.vixns.Utils.getCommit(this).take(8)
+            if (docker_label == null) docker_label = "${BUILD_TIMESTAMP}-${short_commit}"
 
             for (def app in config.apps) {
                     
