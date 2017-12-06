@@ -1,5 +1,7 @@
 package net.vixns
 
+import java.text.SimpleDateFormat
+
 class Utils {
     
     @NonCPS
@@ -31,5 +33,11 @@ class Utils {
 
     static String getCommit(def script) {
         return script.sh(script: 'git rev-parse HEAD', returnStdout: true)?.trim()
+    }
+
+    static String getTimestamp() {
+        def dateFormat = new SimpleDateFormat("yyyyMMddHHmm")
+        def date = new Date()
+        return dateFormat.format(date)
     }
 }
