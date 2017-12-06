@@ -14,10 +14,9 @@ def call (body) {
     withSlackNotification(slaskTeam,slaskToken,slaskChannel) {
         node {
             checkout scm
-            def git_tag = net.vixns.Utils.gitTagName(this)
-            def docker_label = git_tag
+            def ts = net.vixns.Utils.getTimestamp()
             def short_commit = net.vixns.Utils.getCommit(this).take(8)
-            if (docker_label == null) docker_label = "${BUILD_TIMESTAMP}-${short_commit}"
+            def docker_label = "${ts}-${short_commit}"
 
             for (def app in config.apps) {
                     
