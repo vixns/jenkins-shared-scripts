@@ -17,7 +17,7 @@ def call (body) {
             def ts = net.vixns.Utils.getTimestamp()
             def short_commit = net.vixns.Utils.getCommit(this).take(8)
             def docker_label = "${ts}-${short_commit}"
-	    def default_timeout = (config.defaults == null || config.defaults.deploy.timeoutms == null) ?  30000 : config.defaults.deploy.timeoutms;
+	    def default_timeout = (config.defaults == null || config.defaults.deploy == null || config.defaults.deploy.timeoutms == null) ?  30000 : config.defaults.deploy.timeoutms;
 
             for (def app in config.apps) {
                     
@@ -57,7 +57,7 @@ def call (body) {
                                     credentialsId: 'marathonId',
                                     filename: filename,
                                     forceUpdate: true,
-				    timeout: (app.deploy.timeoutms == null) ?  default_timeout : app.deploy.timeoutms,
+				    timeout: (app.deploy == null || app.deploy.timeoutms == null) ?  default_timeout : app.deploy.timeoutms,
                                     id: "/${app.owner}/${app.ns}/${app.group}/${app.env}/${app.name}",
                                     docker: app.image
                                 )
