@@ -17,7 +17,7 @@ def call (body) {
             def ts = net.vixns.Utils.getTimestamp()
             def short_commit = net.vixns.Utils.getCommit(this).take(8)
             def docker_label = "${ts}-${short_commit}"
-	    def default_timeout = (config.defaults == null || config.defaults.deploy == null || config.defaults.deploy.timeoutms == null) ?  30000 : config.defaults.deploy.timeoutms;
+	    def default_timeout = (config.defaults == null || config.defaults.deploy == null || config.defaults.deploy.timeoutms == null) ?  60000 : config.defaults.deploy.timeoutms;
 
             for (def app in config.apps) {
                     
