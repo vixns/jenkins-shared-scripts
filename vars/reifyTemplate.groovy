@@ -16,6 +16,7 @@ def call (template, app) {
                 .replaceAll('_ENV_', app.env)
                 .replaceAll('_NAS_URI_', env.NAS_URI)
                 .replaceAll('_DOCKER_IMAGE_', app.image)
+                .replaceAll('_VOLUME_NAME_', md5("${env.NAS_URI}${app.name}${app.env}"))
 
     if (app.vars != null)
         app.vars.each{ k, v -> filecontents = filecontents.replaceAll("_${k.toUpperCase()}_", v) }
@@ -67,14 +68,14 @@ def call (template, app) {
         withCredentials([
             usernamePassword(credentialsId: "${mysqlCredentialsPrefix}_mysql", usernameVariable: 'MYSQL_USER', passwordVariable: 'MYSQL_PASSWORD')
             ]) {
-            filecontents = filecontents   
+            filecontents = filecontents
                 .replaceAll('_MYSQL_USER_', env.MYSQL_USER)
                 .replaceAll('_MYSQL_PASSWORD_', env.MYSQL_PASSWORD)
                 .replaceAll('_MYSQL_HOST_', app.mysql.host)
                 .replaceAll('_MYSQL_PORT_', app.mysql.port)
                 .replaceAll('_MYSQL_DATABASE_', app.mysql.database)
         }
-    } 
+    }
     if (app.vhost != null)
         filecontents = filecontents
             .replaceAll('_VHOST_', app.vhost)
