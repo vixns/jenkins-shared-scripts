@@ -16,7 +16,7 @@ def call (template, app) {
                 .replaceAll('_ENV_', app.env)
                 .replaceAll('_NAS_URI_', env.NAS_URI)
                 .replaceAll('_DOCKER_IMAGE_', app.image)
-                .replaceAll('_VOLUME_NAME_', md5("${env.NAS_URI}${app.name}${app.env}"))
+                .replaceAll('_VOLNAME_', md5("${env.NAS_URI}${app.name}${app.env}"))
 
     if (app.vars != null)
         app.vars.each{ k, v -> filecontents = filecontents.replaceAll("_${k.toUpperCase()}_", v) }
