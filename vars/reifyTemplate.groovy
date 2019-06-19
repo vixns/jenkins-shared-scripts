@@ -56,7 +56,7 @@ def call (template, app) {
     if (app.command != null) {
         def command = (app.hasBreakingChanges != null && app.hasBreakingChanges) ? app.command.bc : app.command.regular
         filecontents = filecontents
-            .replaceAll('_COMMAND_', command)
+            .replaceAll('_COMMAND_', java.util.regex.Matcher.quoteReplacement(command))
             .replaceAll('_PERIOD_MINUTES_', (app.command.period_minutes != null) ? app.command.period_minutes : "15")
     }
     if (app.mysql != null) {
